@@ -45,7 +45,27 @@ int checkFilesExistence(int n) {
 
     return 0x1; // Zwrócenie true jeśli wszystkie pliki istnieją
 }
+bool checkCopiedFilesExistence(int n) {
+    int result = 0;
 
+    for (int i = 1; i <= n; ++i) {
+        wchar_t filename[MAX_PATH];
+        swprintf(filename, MAX_PATH, L"app%d_copy.dll", i);
+
+        char filenameChar[MAX_PATH];
+        wcstombs(filenameChar, filename, MAX_PATH);
+
+        FILE* file = fopen(filenameChar, "r");
+        if (file == NULL) {
+            result = 0xF1; // Ustawienie wyniku na 0xF1 jeśli plik nie istnieje
+            break; // Przerwanie pętli, gdy pojawi się pierwszy nieistniejący plik
+        } else {
+            fclose(file);
+        }
+    }
+
+    return result;
+}
 
 #include <dlfcn.h>
 
