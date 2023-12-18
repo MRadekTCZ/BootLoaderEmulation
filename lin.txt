@@ -14,9 +14,9 @@ int CopyDLLWithCopySuffix(const char *fileName) {
         strcpy(copiedFileName, fileName);
         char* dotPosition = strrchr(copiedFileName, '.');
         if (dotPosition != NULL) {
-            strcpy(dotPosition, "_copy.dll");
+            strcpy(dotPosition, "_copy.so");
         } else {
-            strcat(copiedFileName, "_copy.dll");
+            strcat(copiedFileName, "_copy.so");
         }
 
         if (rename(fileName, copiedFileName) == 0) {
@@ -33,7 +33,7 @@ int CopyDLLWithCopySuffix(const char *fileName) {
 int checkFilesExistence(int n) {
     for (int i = 1; i <= n; ++i) {
         wchar_t filename[PATH_MAX];
-        swprintf(filename, PATH_MAX, L"app%d.dll", i);
+        swprintf(filename, PATH_MAX, L"app%d.so", i);
 
         FILE* file = fopen("filename", "r");
         if (file == NULL) {
@@ -47,14 +47,16 @@ int checkFilesExistence(int n) {
 }
 
 
+#include <dlfcn.h>
+
 int APP3(int* iCycleCount) {
     typedef void (*MyFunction)(); // Definicja typu wskaźnika na funkcję
 
-    const wchar_t* dllPath = L"libOS3.so"; // Ścieżka do biblioteki .so
+    const char* soPath = "./OS3.so"; // Ścieżka do pliku .so, możesz dostosować nazwę i ścieżkę
 
-    void* handle = dlopen(dllPath, RTLD_LAZY);
+    void* handle = dlopen(soPath, RTLD_LAZY);
     if (handle != NULL) {
-        // printf("DLL loaded successfully.\n");
+        // printf("SO loaded successfully.\n");
 
         // Pobranie adresu funkcji z biblioteki
         MyFunction myFunc = (MyFunction)dlsym(handle, "os3");
@@ -67,7 +69,7 @@ int APP3(int* iCycleCount) {
 
         dlclose(handle); // Zamknięcie biblioteki po zakończeniu pracy
     } else {
-        printf("Error loading the DLL: %s\n", dlerror());
+        printf("Error loading the SO: %s\n", dlerror());
     }
     
     *iCycleCount = *iCycleCount + 1;
@@ -93,9 +95,9 @@ int CopyDLLWithCopySuffix(const wchar_t *fileName) {
 
         wchar_t* dotPosition = wcsrchr(copiedFileName, L'.');
         if (dotPosition != NULL) {
-            wcscpy(dotPosition, L"_copy.dll");
+            wcscpy(dotPosition, L"_copy.so");
         } else {
-            wcscat(copiedFileName, L"_copy.dll");
+            wcscat(copiedFileName, L"_copy.so");
         }
 
         if (link(fileName, copiedFileName) == 0) {
